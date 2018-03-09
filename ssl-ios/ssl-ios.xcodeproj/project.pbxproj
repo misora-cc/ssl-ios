@@ -16,6 +16,7 @@
 		5370DD56205002E800B3D964 /* ssl-ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD55205002E800B3D964 /* ssl-ios.mm */; };
 		5370DD592051185F00B3D964 /* SSLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD582051185F00B3D964 /* SSLSocket.m */; };
 		5370DD9A2052615800B3D964 /* SSLSocketTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD992052615800B3D964 /* SSLSocketTest.m */; };
+		5370DD9D2052B0C500B3D964 /* SSLContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD9B2052B0C400B3D964 /* SSLContext.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,8 @@
 		5370DD582051185F00B3D964 /* SSLSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SSLSocket.m; path = ssl/SSLSocket.m; sourceTree = "<group>"; };
 		5370DD982052615800B3D964 /* SSLSocketTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SSLSocketTest.h; sourceTree = "<group>"; };
 		5370DD992052615800B3D964 /* SSLSocketTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SSLSocketTest.m; sourceTree = "<group>"; };
+		5370DD9B2052B0C400B3D964 /* SSLContext.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SSLContext.cpp; path = ssl/SSLContext.cpp; sourceTree = "<group>"; };
+		5370DD9C2052B0C400B3D964 /* SSLContext.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SSLContext.hpp; path = ssl/SSLContext.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +70,7 @@
 		5370DD37204FE75400B3D964 /* ssl-ios */ = {
 			isa = PBXGroup;
 			children = (
-				5370DD972052612200B3D964 /* test */,
+				5370DD972052612200B3D964 /* demo */,
 				5370DD53205002E000B3D964 /* ssl */,
 				5370DD38204FE75400B3D964 /* AppDelegate.h */,
 				5370DD39204FE75400B3D964 /* AppDelegate.m */,
@@ -89,17 +92,19 @@
 				5370DD55205002E800B3D964 /* ssl-ios.mm */,
 				5370DD572051185F00B3D964 /* SSLSocket.h */,
 				5370DD582051185F00B3D964 /* SSLSocket.m */,
+				5370DD9B2052B0C400B3D964 /* SSLContext.cpp */,
+				5370DD9C2052B0C400B3D964 /* SSLContext.hpp */,
 			);
 			name = ssl;
 			sourceTree = "<group>";
 		};
-		5370DD972052612200B3D964 /* test */ = {
+		5370DD972052612200B3D964 /* demo */ = {
 			isa = PBXGroup;
 			children = (
 				5370DD982052615800B3D964 /* SSLSocketTest.h */,
 				5370DD992052615800B3D964 /* SSLSocketTest.m */,
 			);
-			path = test;
+			path = demo;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -176,6 +181,7 @@
 				5370DD56205002E800B3D964 /* ssl-ios.mm in Sources */,
 				5370DD9A2052615800B3D964 /* SSLSocketTest.m in Sources */,
 				5370DD3D204FE75400B3D964 /* ViewController.m in Sources */,
+				5370DD9D2052B0C500B3D964 /* SSLContext.cpp in Sources */,
 				5370DD592051185F00B3D964 /* SSLSocket.m in Sources */,
 				5370DD48204FE75400B3D964 /* main.m in Sources */,
 				5370DD3A204FE75400B3D964 /* AppDelegate.m in Sources */,

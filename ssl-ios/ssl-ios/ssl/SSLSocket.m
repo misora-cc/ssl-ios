@@ -344,9 +344,9 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
             [self asyncRead:_sock callback:^(int result, const void *data, size_t dataLen) {
                 [self.SSLReadData appendBytes:data length:dataLen];
                 
-                if (dataLen < 0) {
+                if (result != 0) {
                     if (_delegate) {
-                        [_delegate onSend:self result:-1];
+                        [_delegate onSend:self result:result];
                     }
                 }
                 else if (dataLen == 0) {
@@ -392,6 +392,12 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
     if (err == noErr) {
         if (_delegate) {
             [_delegate onRecv:self data:buf length:(int)processed];
+        }
+        return;
+    }
+    else if (err == errSSLClosedGraceful) {
+        if (_delegate) {
+            [_delegate onRecv:self data:buf length:0];
         }
         return;
     }

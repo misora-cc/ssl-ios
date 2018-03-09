@@ -12,7 +12,6 @@
 @class SSLSocket;
 
 
-
 @protocol SSLSocketDelegate
 @required
 -(void) onConnect:(SSLSocket*)socket result:(int)result;

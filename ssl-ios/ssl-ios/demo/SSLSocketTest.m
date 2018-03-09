@@ -35,7 +35,8 @@
     NSMutableString* req = [NSMutableString string];
     [req appendString:@"GET / HTTP/1.1\r\n"];
     [req appendFormat:@"Host: %@\r\n", url.host];
-    [req appendString:@"User-Agent: SSL-Socket-Test\r\n"];
+    [req appendString:@"User-Agent: SSL-Socket-Demo\r\n"];
+    [req appendString:@"Connection: close\r\n"];
     [req appendString:@"\r\n"];
     
     const char* utf8Req = [req UTF8String];
