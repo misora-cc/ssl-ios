@@ -8,8 +8,13 @@
 
 #import "ViewController.h"
 #import "ssl/ssl-ios.hh"
+#import "SSLSocketTest.h"
 
 @interface ViewController ()
+{
+    SSLSocketTest* _socketTest;
+}
+
 
 @end
 
@@ -18,6 +23,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    
+    _socketTest = [[SSLSocketTest alloc] init];
+    [_socketTest start];
 }
 
 
