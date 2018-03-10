@@ -7,19 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5357E0E82053F9D000337C9F /* SSLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5357E0E72053F9D000337C9F /* SSLConnection.m */; };
 		5370DD3A204FE75400B3D964 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD39204FE75400B3D964 /* AppDelegate.m */; };
 		5370DD3D204FE75400B3D964 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD3C204FE75400B3D964 /* ViewController.m */; };
 		5370DD40204FE75400B3D964 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5370DD3E204FE75400B3D964 /* Main.storyboard */; };
 		5370DD42204FE75400B3D964 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5370DD41204FE75400B3D964 /* Assets.xcassets */; };
 		5370DD45204FE75400B3D964 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5370DD43204FE75400B3D964 /* LaunchScreen.storyboard */; };
 		5370DD48204FE75400B3D964 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD47204FE75400B3D964 /* main.m */; };
-		5370DD56205002E800B3D964 /* ssl-ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD55205002E800B3D964 /* ssl-ios.mm */; };
-		5370DD592051185F00B3D964 /* SSLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD582051185F00B3D964 /* SSLSocket.m */; };
+		5370DD592051185F00B3D964 /* SSLStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD582051185F00B3D964 /* SSLStream.m */; };
 		5370DD9A2052615800B3D964 /* SSLSocketTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD992052615800B3D964 /* SSLSocketTest.m */; };
-		5370DD9D2052B0C500B3D964 /* SSLContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD9B2052B0C400B3D964 /* SSLContext.cpp */; };
+		5370DD9D2052B0C500B3D964 /* SSLContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD9B2052B0C400B3D964 /* SSLContext.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5357E0E62053F9D000337C9F /* SSLConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SSLConnection.h; path = ssl/SSLConnection.h; sourceTree = "<group>"; };
+		5357E0E72053F9D000337C9F /* SSLConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SSLConnection.m; path = ssl/SSLConnection.m; sourceTree = "<group>"; };
 		5370DD35204FE75400B3D964 /* ssl-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ssl-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5370DD38204FE75400B3D964 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5370DD39204FE75400B3D964 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -30,13 +32,11 @@
 		5370DD44204FE75400B3D964 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5370DD46204FE75400B3D964 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5370DD47204FE75400B3D964 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		5370DD54205002E800B3D964 /* ssl-ios.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = "ssl-ios.hh"; path = "ssl/ssl-ios.hh"; sourceTree = "<group>"; };
-		5370DD55205002E800B3D964 /* ssl-ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "ssl-ios.mm"; path = "ssl/ssl-ios.mm"; sourceTree = "<group>"; };
-		5370DD572051185F00B3D964 /* SSLSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SSLSocket.h; path = ssl/SSLSocket.h; sourceTree = "<group>"; };
-		5370DD582051185F00B3D964 /* SSLSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SSLSocket.m; path = ssl/SSLSocket.m; sourceTree = "<group>"; };
+		5370DD572051185F00B3D964 /* SSLStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SSLStream.h; path = ssl/SSLStream.h; sourceTree = "<group>"; };
+		5370DD582051185F00B3D964 /* SSLStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SSLStream.m; path = ssl/SSLStream.m; sourceTree = "<group>"; };
 		5370DD982052615800B3D964 /* SSLSocketTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SSLSocketTest.h; sourceTree = "<group>"; };
 		5370DD992052615800B3D964 /* SSLSocketTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SSLSocketTest.m; sourceTree = "<group>"; };
-		5370DD9B2052B0C400B3D964 /* SSLContext.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SSLContext.cpp; path = ssl/SSLContext.cpp; sourceTree = "<group>"; };
+		5370DD9B2052B0C400B3D964 /* SSLContext.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = SSLContext.mm; path = ssl/SSLContext.mm; sourceTree = "<group>"; };
 		5370DD9C2052B0C400B3D964 /* SSLContext.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SSLContext.hpp; path = ssl/SSLContext.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,12 +88,12 @@
 		5370DD53205002E000B3D964 /* ssl */ = {
 			isa = PBXGroup;
 			children = (
-				5370DD54205002E800B3D964 /* ssl-ios.hh */,
-				5370DD55205002E800B3D964 /* ssl-ios.mm */,
-				5370DD572051185F00B3D964 /* SSLSocket.h */,
-				5370DD582051185F00B3D964 /* SSLSocket.m */,
-				5370DD9B2052B0C400B3D964 /* SSLContext.cpp */,
+				5370DD572051185F00B3D964 /* SSLStream.h */,
+				5370DD582051185F00B3D964 /* SSLStream.m */,
+				5370DD9B2052B0C400B3D964 /* SSLContext.mm */,
 				5370DD9C2052B0C400B3D964 /* SSLContext.hpp */,
+				5357E0E62053F9D000337C9F /* SSLConnection.h */,
+				5357E0E72053F9D000337C9F /* SSLConnection.m */,
 			);
 			name = ssl;
 			sourceTree = "<group>";
@@ -178,11 +178,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5370DD56205002E800B3D964 /* ssl-ios.mm in Sources */,
+				5357E0E82053F9D000337C9F /* SSLConnection.m in Sources */,
 				5370DD9A2052615800B3D964 /* SSLSocketTest.m in Sources */,
 				5370DD3D204FE75400B3D964 /* ViewController.m in Sources */,
-				5370DD9D2052B0C500B3D964 /* SSLContext.cpp in Sources */,
-				5370DD592051185F00B3D964 /* SSLSocket.m in Sources */,
+				5370DD9D2052B0C500B3D964 /* SSLContext.mm in Sources */,
+				5370DD592051185F00B3D964 /* SSLStream.m in Sources */,
 				5370DD48204FE75400B3D964 /* main.m in Sources */,
 				5370DD3A204FE75400B3D964 /* AppDelegate.m in Sources */,
 			);
@@ -321,6 +321,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = A58RKZ5M79;
 				INFOPLIST_FILE = "ssl-ios/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "cn.misora.ssl-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -335,6 +336,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = A58RKZ5M79;
 				INFOPLIST_FILE = "ssl-ios/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "cn.misora.ssl-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";

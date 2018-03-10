@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SSLSocket.h"
+#import "SSLStream.h"
 
 @interface SSLSocketTest : NSObject <SSLSocketDelegate>
 

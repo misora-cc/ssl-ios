@@ -10,18 +10,17 @@
 #define SSLContext_hpp
 
 #include <stdio.h>
-#include <Security/Security.h>
+#include <stdlib.h>
 
-
-
-class Connection
+// A connected connection provides method to asynchronous send/recv from network
+class Stream
 {
 public:
-    typedef void (*SendCallback) (void* userdata, int err);
-    typedef void (*RecvCallback) (void* userdata, const void* data, int length);
+    typedef void (*WriteCallback) (void* userdata, int err);
+    typedef void (*ReadCallback) (void* userdata, const void* data, int length);
     
-    virtual void Send(const void* data, size_t length, void* userdata, SendCallback callback) = 0;
-    virtual void Recv(void* userdata, RecvCallback callback) = 0;
+    virtual void Write(const void* data, size_t length, void* userdata, WriteCallback callback) = 0;
+    virtual void Read(void* userdata, ReadCallback callback) = 0;
 };
 
 class SSLContext
@@ -31,23 +30,24 @@ public:
     public:
         virtual void OnConnect(int err) = 0;
         virtual void OnSend(int err) = 0;
-        virtual void OnRecv(const void* data, int length) = 0;
-    }
+        virtual void OnRecv(int err, const void* data, size_t length) = 0;
+    };
+
 public:
     SSLContext();
     ~SSLContext();
     
 public:
-    void Handshake(Connection *conn, Handler *handler);
-    void Send();
+    void SetHandler(Handler* handler);
+    void SetConnection(Stream* conn);
+    
+    void Handshake();
+    void Send(const void* data, size_t length);
     void Recv();
     
 private:
-    
-    
-private:
-    Handler* _handler;
-    Connection* _conn;
+    class SSLContextImpl;
+    SSLContextImpl *_impl;
 };
 
 

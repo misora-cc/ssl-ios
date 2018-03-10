@@ -1,12 +1,4 @@
-//
-//  SSLSocket.m
-//  ssl-ios
-//
-//  Created by misora on 2018/3/8.
-//  Copyright © 2018年 misora. All rights reserved.
-//
-
-#import "SSLSocket.h"
+#import "SSLStream.h"
 #include <sys/time.h>
 #include <sys/select.h>
 #include <unistd.h>
@@ -17,7 +9,7 @@
 #include <arpa/inet.h>
 
 
-@interface SSLSocket ()
+@interface SSLStream ()
 
 @property (assign) BOOL needRead;
 @property (retain, readonly) NSMutableData* SSLWriteData;
@@ -25,12 +17,8 @@
 
 @end
 
-@implementation SSLSocket
+@implementation SSLStream
 {
-    NSString* _ip;
-    int _port;
-    int _sock;
-    
     SSLContextRef _ssl;
     NSData* _sendData;
 }
@@ -43,91 +31,10 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
     self = [super init];
     if (self)
     {
-        _sock = -1;
-        
         _SSLWriteData = [[NSMutableData alloc] init];
         _SSLReadData = [[NSMutableData alloc] init];
     }
     return self;
-}
-
--(void) connect:(NSString*)ip port:(int)port
-{
-    if (_sock != -1) {
-        return;
-    }
-    
-    _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (_sock == -1) {
-        NSLog(@"failed create socket, err=%d", errno);
-        return;
-    }
-    //set sock to non-block
-    int flags = fcntl(_sock, F_GETFL, 0);
-    if (0 != fcntl(_sock, F_SETFL, flags|O_NONBLOCK)) {
-        return;
-    }
-    
-    _ip = ip;
-    _port = port;
-
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = inet_addr([ip UTF8String]);
-    addr.sin_port = htons((unsigned short)port);
-    
-    int ret = connect(_sock, (const struct sockaddr*)&addr, sizeof(addr));
-    if (ret == 0) {
-        return;
-    }
-    
-    if (errno == EINPROGRESS) {
-        [self select:_sock read:NO write:YES callback:^(int result) {
-            [self onConnect:result];
-        }];
-        return;
-    }
-    return;
-}
-
--(void) select:(int)sock read:(BOOL)read write:(BOOL)write callback:(void (^)(int result))cb
-{
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        
-        fd_set readSet;
-        fd_set writeSet;
-        fd_set exceptSet;
-        
-        if (read) {
-            FD_ZERO(&readSet);
-            FD_SET(sock, &readSet);
-        }
-        if (write) {
-            FD_ZERO(&writeSet);
-            FD_SET(sock, &writeSet);
-        }
-        FD_ZERO(&exceptSet);
-        FD_SET(sock, &exceptSet);
-        
-        struct timeval timeout;
-        timeout.tv_sec = 30;
-        timeout.tv_usec = 0;
-        int ret = select(sock+1, read ? &readSet : NULL, write ? &writeSet : NULL, &exceptSet, &timeout);
-        if (ret == 0) { //timeout
-            cb(-1);
-        }
-        else if (ret < 0) { //handle error
-            cb(errno);
-        }
-        else { //success
-            if (FD_ISSET(sock, &readSet) || FD_ISSET(sock, &writeSet)) {
-                cb(0);
-            }
-            else {
-                cb(-1);
-            }
-        }
-    });
 }
 
 -(void) asyncRead:(int)sock callback:(void (^)(int result, const void* data, size_t dataLen))cb
@@ -333,7 +240,7 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
                 }
                 else {
                     //fail
-                    NSLog(@"SSLWrite with 0 bytes fail, err=%d", err);
+                    NSLog(@"SSLWrite with 0 bytes fail, err=%d", (int)err);
                     if (_delegate) {
                         [_delegate onSend:self result:0];
                     }
@@ -355,7 +262,8 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
                     }
                 }
                 
-                OSStatus err = SSLWrite(_ssl, NULL, 0, NULL);
+                size_t processed = 0;
+                OSStatus err = SSLWrite(_ssl, NULL, 0, &processed);
                 if (err == noErr) {
                     if (_delegate) {
                         [_delegate onSend:self result:0];
@@ -419,7 +327,7 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
 
 static OSStatus _SSLRead(SSLConnectionRef connection, void *data, size_t *dataLength)
 {
-    SSLSocket* _self = (__bridge SSLSocket*)connection;
+    SSLStream* _self = (__bridge SSLStream*)connection;
     NSLog(@"_SSLRead, require-length=%lu, cache-length=%lu", *dataLength, _self.SSLReadData.length);
     
     if (*dataLength == 0) {
@@ -448,7 +356,7 @@ static OSStatus _SSLRead(SSLConnectionRef connection, void *data, size_t *dataLe
 
 static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t *dataLength)
 {
-    SSLSocket* _self = (__bridge SSLSocket*)connection;
+    SSLStream* _self = (__bridge SSLStream*)connection;
     [_self.SSLWriteData appendBytes:data length:*dataLength];
     return errSSLWouldBlock;    //the data has not been sent yet
 }

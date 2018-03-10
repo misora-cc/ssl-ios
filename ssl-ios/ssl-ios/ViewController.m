@@ -7,7 +7,6 @@
 //
 
 #import "ViewController.h"
-#import "ssl/ssl-ios.hh"
 #import "SSLSocketTest.h"
 
 @interface ViewController ()
