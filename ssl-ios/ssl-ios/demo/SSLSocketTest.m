@@ -7,69 +7,88 @@
 //
 
 #import "SSLSocketTest.h"
-
+#import "SSLConnection.h"
 
 @implementation SSLSocketTest
 {
-    SSLSocket* _socket;
+    NSURL* _url;
+    SSLStream* _sslStream;
+    SSLConnection* _connection;
     NSMutableData* _recvData;
 }
 
 -(void) start
 {
-    _socket = [[SSLSocket alloc] init];
-    _socket.delegate = self;
-    [_socket connect:@"101.227.143.56" port:443];
+    _url = [NSURL URLWithString:@"https://github.com"];
+    _connection = [[SSLConnection alloc] init];
+    [_connection connect:_url.host port:443 callback:^(int err) {
+        
+        if (err) {
+            NSLog(@"connect fail, err=%d", err);
+            return;
+        }
+        NSLog(@"connect success, start ssl handshake");
+        _sslStream.delegate = self;
+        _sslStream.connection = _connection;
+        [_sslStream handshake];
+    }];
 }
 
--(void) onConnect:(SSLSocket*)socket result:(int)result
+-(void) onHandshake:(SSLStream*)stream error:(int)error
 {
-    if (result) {
-        NSLog(@"SSLSocketTest.onConnect, connect fail, result=%d", result);
+    if (error) {
+        NSLog(@"handshake fail, err=%d", error);
         return;
     }
-    NSLog(@"SSLSocketTest.onConnect, success");
-    
-    NSURL* url = [[NSURL alloc] initWithString:@"http://www.qq.com"];
+    NSLog(@"handshake success, start sending request");
     
     NSMutableString* req = [NSMutableString string];
-    [req appendString:@"GET / HTTP/1.1\r\n"];
-    [req appendFormat:@"Host: %@\r\n", url.host];
+    [req appendFormat:@"GET %@ HTTP/1.1\r\n", _url.path];
+    [req appendFormat:@"Host: %@\r\n", _url.host];
     [req appendString:@"User-Agent: SSL-Socket-Demo\r\n"];
     [req appendString:@"Connection: close\r\n"];
     [req appendString:@"\r\n"];
     
     const char* utf8Req = [req UTF8String];
-    [_socket send:utf8Req length:strlen(utf8Req)];
+    [_sslStream send:utf8Req length:strlen(utf8Req)];
 }
 
--(void) onRecv:(SSLSocket*)socket data:(const void*)data length:(int)length
+-(void) onSend:(SSLStream*)stream error:(int)error
 {
-    if (length == 0) {
-        NSLog(@"SSLSocketTest.onRecv, length==0, remote disconnected");
+    if (error) {
+        NSLog(@"onSend, fail, err=%d", error);
         return;
     }
-    else if (length < 0) {
-        NSLog(@"SSLSocketTest.onRecv, fail, result=%d", length);
+    NSLog(@"onSend, sucecss, start receiving response");
+    
+    [_sslStream recv];
+}
+
+-(void) onRecv:(SSLStream*)stream error:(int)error data:(const void*)data length:(size_t)length
+{
+    if (error) {
+        NSLog(@"recv fail, err=%d", error);
         return;
     }
-    NSLog(@"SSLSocketTest.onRecv, recv-length=%d", length);
+    else if (length == 0) {
+        NSLog(@"onRecv, length==0, remote disconnected");
+        NSLog(@"response:\n");
+        if (!_recvData) {
+            NSLog(@"(empty)");
+        }
+        else {
+            NSString* content = [[NSString alloc] initWithData:_recvData encoding:NSUTF8StringEncoding];
+            NSLog(@"%@", content);
+        }
+        return;
+    }
+    NSLog(@"onRecv, length=%lu", length);
     
     if (!_recvData) {
         _recvData = [[NSMutableData alloc] init];
     }
     [_recvData appendBytes:data length:length];
-    [_socket recv]; //continue receiving
-}
-
--(void) onSend:(SSLSocket*)socket result:(int)result
-{
-    if (result) {
-        NSLog(@"SSLSocketTest.onSend, fail, result=%d", result);
-        return;
-    }
-    NSLog(@"SSLSocketTest.onSend, success");
-    [_socket recv];
+    [_sslStream recv]; // continue receiving
 }
 
 @end

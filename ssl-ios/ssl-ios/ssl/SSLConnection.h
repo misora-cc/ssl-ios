@@ -13,6 +13,9 @@
 
 -(void) connect:(NSString*)host port:(int)port callback:(void (^)(int err))cb;
 
+-(void) recv:(void (^)(int err, const void* data, size_t length))cb;
+
+-(void) send:(const void*)data length:(size_t)length callback:(void (^)(int err))cb;
 
 
 @end

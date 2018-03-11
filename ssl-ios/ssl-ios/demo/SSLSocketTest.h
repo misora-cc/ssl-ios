@@ -13,4 +13,8 @@
 
 -(void) start;
 
+-(void) onHandshake:(SSLStream*)stream error:(int)error;
+-(void) onRecv:(SSLStream*)stream error:(int)error data:(const void*)data length:(size_t)length;
+-(void) onSend:(SSLStream*)stream error:(int)error;
+
 @end

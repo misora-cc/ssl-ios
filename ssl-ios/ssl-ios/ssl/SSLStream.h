@@ -13,15 +13,15 @@
 
 @protocol ConnectionDelegate
 @required
--(void) recv:(void (^)(int err, const void* data, int length))cb;
+-(void) recv:(void (^)(int err, const void* data, size_t length))cb;
 -(void) send:(const void*)data length:(size_t)length callback:(void (^)(int err))cb;
 @end
 
 @protocol SSLSocketDelegate
 @required
 -(void) onHandshake:(SSLStream*)stream error:(int)error;
--(void) onRecv:(SSLStream*)stream data:(const void*)data length:(int)length;
--(void) onSend:(SSLStream*)stream result:(int)result;
+-(void) onRecv:(SSLStream*)stream error:(int)error data:(const void*)data length:(size_t)length;
+-(void) onSend:(SSLStream*)stream error:(int)error;
 @end
          
 @interface SSLStream : NSObject
@@ -30,7 +30,7 @@
 @property (retain) id<ConnectionDelegate> connection;
 
 // begin SSL handshake
--(void) handshake;
+-(BOOL) handshake;
 
 // begin send data to remote
 -(void) send:(const void*)data length:(size_t)length;

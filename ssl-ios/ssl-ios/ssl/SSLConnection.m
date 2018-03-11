@@ -137,5 +137,81 @@
     });
 }
 
+-(void) send:(const void*)data length:(size_t)length callback:(void (^)(int err))cb
+{
+    if (!data || !length) {
+        return;
+    }
+    
+    NSData* dataCopy = [NSData dataWithBytes:data length:length];
+    [self _send:_sock data:dataCopy offset:0 callback:cb];
+}
+
+-(void) _send:(int)sock data:(NSData*)data offset:(size_t)offset callback:(void (^)(int err))cb
+{
+    [self select:sock read:NO write:YES callback:^(int result) {
+        
+        if (result) {   //error
+            cb(result);
+            return;
+        }
+        
+        size_t length = data.length - offset;
+        ssize_t nsend = send(sock, (const char*)data.bytes + offset, length, 0);
+        if (nsend > 0) {
+            if (nsend < length) { //partial send
+                size_t newOffset = offset + nsend;
+                [self _send:sock data:data offset:newOffset callback:cb];
+            }
+            else {  //all send
+                cb(0);
+            }
+            return;
+        }
+        else if (nsend == 0) {  // should not happen
+            cb(-1);
+            return;
+        }
+        else {
+            int err = errno;
+            if (err == EAGAIN || err == EWOULDBLOCK) { //should not happen
+                if (offset < data.length){  //retry
+                    [self _send:sock data:data offset:offset callback:cb];
+                }
+                else { //all data is sent
+                    cb(0);
+                }
+            }
+            else { //notify error happened
+                cb(err);
+            }
+        }
+    }];
+}
+
+-(void) recv:(void (^)(int err, const void* data, size_t length))cb
+{
+    [self select:_sock read:YES write:NO callback:^(int result) {
+        
+        if (result != 0) {
+            cb(result, NULL, 0);
+        }
+        else {
+            char data[16*1024];
+            ssize_t nread = recv(_sock, data, sizeof(data), 0);
+            if (nread > 0) {
+                cb(0, data, nread);
+            }
+            else if (nread == 0) {
+                cb(0, NULL, 0);
+            }
+            else {
+                int err = errno;
+                cb(err, NULL, 0);
+            }
+            return;
+        }
+    }];
+}
 
 @end

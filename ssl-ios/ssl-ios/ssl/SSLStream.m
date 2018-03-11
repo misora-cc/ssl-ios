@@ -37,97 +37,19 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
     return self;
 }
 
--(void) asyncRead:(int)sock callback:(void (^)(int result, const void* data, size_t dataLen))cb
+-(BOOL) handshake
 {
-    [self select:sock read:YES write:NO callback:^(int result) {
-       
-        if (result != 0) {
-            cb(result, NULL, 0);
-        }
-        else {
-            char data[16*1024];
-            ssize_t nread = recv(sock, data, sizeof(data), 0);
-            if (nread > 0) {
-                cb(0, data, nread);
-            }
-            else if (nread == 0) {
-                cb(0, NULL, 0);
-            }
-            else {
-                int err = errno;
-                cb(err, NULL, 0);
-            }
-            return;
-        }
-    }];
-}
-
--(void) asyncWrite:(const void*)data length:(size_t)length callback:(void (^)(int result))cb
-{
-    NSData* dataCopy = [NSData dataWithBytes:data length:length];
-    [self asyncWriteData:_sock data:dataCopy offset:0 callback:cb];
-}
-
--(void) asyncWriteData:(int)sock data:(NSData*)data offset:(size_t)offset callback:(void (^)(int result))cb
-{
-    [self select:sock read:NO write:YES callback:^(int result) {
-        
-        if (result) {   //error
-            cb(result);
-            return;
-        }
-        
-        size_t length = data.length - offset;
-        ssize_t nsend = send(sock, (const char*)data.bytes + offset, length, 0);
-        if (nsend > 0) {
-            if (nsend < length) { //partial send
-                size_t newOffset = offset + nsend;
-                [self asyncWriteData:sock data:data offset:newOffset callback:cb];
-            }
-            else {  //all send
-                cb(0);
-            }
-            return;
-        }
-        else if (nsend == 0) {  // should not happen
-            cb(-1);
-            return;
-        }
-        else {
-            int err = errno;
-            if (err == EAGAIN || err == EWOULDBLOCK) { //should not happen
-                if (offset < data.length){  //retry
-                    [self asyncWriteData:sock data:data offset:offset callback:cb];
-                }
-                else { //all data is sent
-                    cb(0);
-                }
-            }
-            else { //notify error happened
-                cb(err);
-            }
-        }
-    }];
-}
-
--(void) onConnect:(int)result
-{
-    if (result != 0) {
-        NSLog(@"onConnect, result=%d", result);
-        if (_delegate) {
-            [_delegate onConnect:self result:result];
-        }
-        return;
+    if (!_connection || !_delegate) {
+        return NO;
     }
-    
     [self initSSLContext];
     [self sslHandshake];
+    return YES;
 }
 
 -(void) initSSLContext
 {
     _ssl = SSLCreateContext(NULL, kSSLClientSide, kSSLStreamType);
-    
     SSLSetIOFuncs(_ssl, &_SSLRead, &_SSLWrite);
     SSLSetConnection(_ssl, (SSLConnectionRef)self);
 }
@@ -137,18 +59,18 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
     OSStatus err = SSLHandshake(_ssl);
     if (err == noErr) { //success
         if (_delegate) {
-            [_delegate onConnect:self result:0];
+            [_delegate onHandshake:self error:0];
         }
         return;
     }
     else if (err == errSSLWouldBlock) {
         if (self.SSLWriteData.length > 0) {
-            [self asyncWriteData:_sock data:self.SSLWriteData offset:0 callback:^(int result) {
+            [_connection send:self.SSLWriteData.bytes length:self.SSLWriteData.length callback:^(int err) {
                 self.SSLWriteData.length = 0;
-                if (result) {
-                    NSLog(@"sslHandshake, asyncWriteData fail, result:%d", result);
+                if (err) {
+                    NSLog(@"sslHandshake, send data fail, err:%d", err);
                     if (_delegate) {
-                        [_delegate onConnect:self result:result];
+                        [_delegate onHandshake:self error:err];
                     }
                     return;
                 }
@@ -157,14 +79,15 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
             return;
         }
         else if (self.needRead) {
-            [self asyncRead:_sock callback:^(int result, const void *data, size_t dataLen) {
-                if (result) {
+            [_connection recv:^(int err, const void *data, size_t length) {
+                if (err || length == 0) {
+                    NSLog(@"sslHandshake, recv fail, err=%d, length=%lu", err, length);
                     if (_delegate) {
-                        [_delegate onConnect:self result:result];
+                        [_delegate onHandshake:self error:err];
                     }
                     return;
                 }
-                [self.SSLReadData appendBytes:data length:dataLen];
+                [self.SSLReadData appendBytes:data length:length];
                 [self sslHandshake];
             }];
             return;
@@ -172,7 +95,7 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
         else {
             // something is wrong
             if (_delegate) {
-                [_delegate onConnect:self result:-1];
+                [_delegate onHandshake:self error:-1];
             }
         }
     }
@@ -180,7 +103,7 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
         NSLog(@"sslHandshake, SSLHandshake fail, err=%d", err);
         // handshake failed
         if (_delegate) {
-            [_delegate onConnect:self result:-1];
+            [_delegate onHandshake:self error:(int)err];
         }
     }
 }
