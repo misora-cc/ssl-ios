@@ -15,8 +15,6 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
 
 
 SSLContext::SSLContext()
-:_handler(nullptr)
-,_conn(nullptr)
 {
 }
 
@@ -26,12 +24,10 @@ SSLContext::~SSLContext()
 
 void SSLContext::SetHandler(SSLContext::Handler *handler)
 {
-    _handler = handler;
 }
 
 void SSLContext::SetConnection(Stream *conn)
 {
-    _conn = conn;
 }
 
 void SSLContext::Handshake()
@@ -49,14 +45,14 @@ void SSLContext::Recv()
     
 }
 
-OSStatus SSLContext::_SSLRead(SSLConnectionRef connection, void *data, size_t *dataLength)
+OSStatus _SSLRead(SSLConnectionRef connection, void *data, size_t *dataLength)
 {
-    
+    return noErr;
 }
 
-OSStatus SSLContext::_SSLWrite(SSLConnectionRef connection, const void *data, size_t *dataLength)
+OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t *dataLength)
 {
-    
+    return noErr;
 }
 
 
