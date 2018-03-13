@@ -41,6 +41,7 @@
             else {
                 _textResponse.text = @"request failed";
             }
+            _socketTest = nil;
         });
     }];
 }

@@ -23,6 +23,12 @@
     int _sock;
 }
 
+-(void) dealloc {
+    if (_sock != -1) {
+        close(_sock);
+    }
+}
+
 -(void) connect:(NSString *)host port:(int)port callback:(void (^)(int))cb
 {
     if (!host || !port) {

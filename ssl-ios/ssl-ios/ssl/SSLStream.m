@@ -37,6 +37,13 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
     return self;
 }
 
+-(void) dealloc {
+    if (_ssl) {
+        CFRelease(_ssl);
+        _ssl = nil;
+    }
+}
+
 -(BOOL) handshake:(NSString*)host
 {
     if (!_connection || !_delegate) {
