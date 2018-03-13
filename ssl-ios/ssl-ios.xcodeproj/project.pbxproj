@@ -16,7 +16,6 @@
 		5370DD48204FE75400B3D964 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD47204FE75400B3D964 /* main.m */; };
 		5370DD592051185F00B3D964 /* SSLStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD582051185F00B3D964 /* SSLStream.m */; };
 		5370DD9A2052615800B3D964 /* SSLSocketTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD992052615800B3D964 /* SSLSocketTest.m */; };
-		5370DD9D2052B0C500B3D964 /* SSLContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5370DD9B2052B0C400B3D964 /* SSLContext.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,8 +35,6 @@
 		5370DD582051185F00B3D964 /* SSLStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SSLStream.m; path = ssl/SSLStream.m; sourceTree = "<group>"; };
 		5370DD982052615800B3D964 /* SSLSocketTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SSLSocketTest.h; sourceTree = "<group>"; };
 		5370DD992052615800B3D964 /* SSLSocketTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SSLSocketTest.m; sourceTree = "<group>"; };
-		5370DD9B2052B0C400B3D964 /* SSLContext.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = SSLContext.mm; path = ssl/SSLContext.mm; sourceTree = "<group>"; };
-		5370DD9C2052B0C400B3D964 /* SSLContext.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SSLContext.hpp; path = ssl/SSLContext.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,8 +87,6 @@
 			children = (
 				5370DD572051185F00B3D964 /* SSLStream.h */,
 				5370DD582051185F00B3D964 /* SSLStream.m */,
-				5370DD9B2052B0C400B3D964 /* SSLContext.mm */,
-				5370DD9C2052B0C400B3D964 /* SSLContext.hpp */,
 				5357E0E62053F9D000337C9F /* SSLConnection.h */,
 				5357E0E72053F9D000337C9F /* SSLConnection.m */,
 			);
@@ -181,7 +176,6 @@
 				5357E0E82053F9D000337C9F /* SSLConnection.m in Sources */,
 				5370DD9A2052615800B3D964 /* SSLSocketTest.m in Sources */,
 				5370DD3D204FE75400B3D964 /* ViewController.m in Sources */,
-				5370DD9D2052B0C500B3D964 /* SSLContext.mm in Sources */,
 				5370DD592051185F00B3D964 /* SSLStream.m in Sources */,
 				5370DD48204FE75400B3D964 /* main.m in Sources */,
 				5370DD3A204FE75400B3D964 /* AppDelegate.m in Sources */,
