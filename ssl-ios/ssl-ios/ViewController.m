@@ -12,8 +12,9 @@
 @interface ViewController ()
 {
     SSLSocketTest* _socketTest;
+    __weak IBOutlet UITextField *_textURL;
+    __weak IBOutlet UITextView *_textResponse;
 }
-
 
 @end
 
@@ -22,11 +23,27 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
-    _socketTest = [[SSLSocketTest alloc] init];
-    [_socketTest start];
 }
 
+- (IBAction)onGet:(id)sender {
+    
+    if (!_textURL.text || _textURL.text.length == 0) {
+        _textResponse.text = @"invalid url";
+        return;
+    }
+    
+    _socketTest = [[SSLSocketTest alloc] init];
+    [_socketTest start:_textURL.text callback:^(NSString *response) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (response) {
+                _textResponse.text = response;
+            }
+            else {
+                _textResponse.text = @"request failed";
+            }
+        });
+    }];
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

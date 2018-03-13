@@ -32,10 +32,11 @@
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         
         struct sockaddr_in connectAddr;
-        if ([self getIPByName:[host UTF8String]  addr:&connectAddr]) {
+        if (![self getIPByName:[host UTF8String] addr:&connectAddr]) {
             cb(-1);
             return;
         }
+        connectAddr.sin_port = htons(port);
         
         _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (_sock == -1) {

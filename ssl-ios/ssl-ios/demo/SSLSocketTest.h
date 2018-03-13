@@ -9,9 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "SSLStream.h"
 
+
 @interface SSLSocketTest : NSObject <SSLSocketDelegate>
 
--(void) start;
+-(void) start:(NSString*)url callback:(void (^)(NSString* response))cb;
 
 -(void) onHandshake:(SSLStream*)stream error:(int)error;
 -(void) onRecv:(SSLStream*)stream error:(int)error data:(const void*)data length:(size_t)length;

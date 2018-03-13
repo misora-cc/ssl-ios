@@ -13,6 +13,7 @@
 
 @protocol ConnectionDelegate
 @required
+//send and recv method should have default timeout interval, or we may hung up when server never return any data
 -(void) recv:(void (^)(int err, const void* data, size_t length))cb;
 -(void) send:(const void*)data length:(size_t)length callback:(void (^)(int err))cb;
 @end
@@ -30,7 +31,7 @@
 @property (retain) id<ConnectionDelegate> connection;
 
 // begin SSL handshake
--(BOOL) handshake;
+-(BOOL) handshake:(NSString*)host;
 
 // begin send data to remote
 -(void) send:(const void*)data length:(size_t)length;

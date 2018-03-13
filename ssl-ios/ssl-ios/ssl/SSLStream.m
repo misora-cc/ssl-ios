@@ -11,7 +11,6 @@
 
 @interface SSLStream ()
 
-@property (assign) BOOL needRead;
 @property (retain, readonly) NSMutableData* SSLWriteData;
 @property (retain, readonly) NSMutableData* SSLReadData;
 
@@ -21,6 +20,7 @@
 {
     SSLContextRef _ssl;
     NSData* _sendData;
+    NSString* _host;
 }
 
 static OSStatus _SSLRead(SSLConnectionRef connection, void *data, size_t *dataLength);
@@ -37,11 +37,12 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
     return self;
 }
 
--(BOOL) handshake
+-(BOOL) handshake:(NSString*)host
 {
     if (!_connection || !_delegate) {
         return NO;
     }
+    _host = host;
     [self initSSLContext];
     [self sslHandshake];
     return YES;
@@ -50,6 +51,8 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
 -(void) initSSLContext
 {
     _ssl = SSLCreateContext(NULL, kSSLClientSide, kSSLStreamType);
+    const char* utf8Host = [_host UTF8String];
+    SSLSetPeerDomainName(_ssl, utf8Host, strlen(utf8Host));
     SSLSetIOFuncs(_ssl, &_SSLRead, &_SSLWrite);
     SSLSetConnection(_ssl, (SSLConnectionRef)self);
 }
@@ -64,43 +67,16 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
         return;
     }
     else if (err == errSSLWouldBlock) {
-        if (self.SSLWriteData.length > 0) {
-            [_connection send:self.SSLWriteData.bytes length:self.SSLWriteData.length callback:^(int err) {
-                self.SSLWriteData.length = 0;
-                
-                if (err) {
-                    NSLog(@"sslHandshake, send data fail, err:%d", err);
-                    if (_delegate) {
-                        [_delegate onHandshake:self error:err];
-                    }
-                    return;
+        [self handlePendingIO:^(int error) {
+            if (error) {
+                NSLog(@"sslHandshake, handlePendingIO fail, err=%d", error);
+                if (_delegate) {
+                    [_delegate onHandshake:self error:error];
                 }
-                [self sslHandshake];
-            }];
-            return;
-        }
-        else if (self.needRead) {
-            [_connection recv:^(int err, const void *data, size_t length) {
-                self.needRead = NO; //reset the flag for reading
-                
-                if (err || length == 0) {
-                    NSLog(@"sslHandshake, recv fail, err=%d, length=%lu", err, length);
-                    if (_delegate) {
-                        [_delegate onHandshake:self error:err];
-                    }
-                    return;
-                }
-                [self.SSLReadData appendBytes:data length:length];
-                [self sslHandshake];
-            }];
-            return;
-        }
-        else {
-            NSLog(@"sslHandshake, errSSLWouldBlock but no read or write.");
-            if (_delegate) {
-                [_delegate onHandshake:self error:-1];
+                return;
             }
-        }
+            [self sslHandshake];
+        }];
     }
     else {
         NSLog(@"sslHandshake, SSLHandshake fail, err=%d", err);
@@ -127,7 +103,7 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
 
 -(void) _send:(NSData*)data offset:(size_t)offset
 {
-    NSAssert(self.needRead == NO && self.SSLWriteData.length == 0, @"invalid internal state");
+    NSAssert(self.SSLWriteData.length == 0, @"invalid internal state");
     
     size_t processed = 0;
     size_t sendLength = !data ? 0 : data.length - offset;
@@ -176,6 +152,7 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
         return;
     }
     else if (err == errSSLClosedGraceful) {
+        NSLog(@"recv, SSLRead return closed graceful");
         if (_delegate) {
             [_delegate onRecv:self error:0 data:NULL length:0];
         }
@@ -184,6 +161,7 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
     else if (err == errSSLWouldBlock) {
         [self handlePendingIO:^(int error) {
             if (error) {
+                NSLog(@"recv, handlePendingIO fail, error=%d", error);
                 if (_delegate) {
                     [_delegate onRecv:self error:error data:NULL length:0];
                 }
@@ -193,6 +171,7 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
         }];
     }
     else {
+        NSLog(@"SSLRead fail, error=%d", (int)err);
         if (_delegate) {
             [_delegate onRecv:self error:(int)err data:NULL length:0];
         }
@@ -213,10 +192,8 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
             callback(0);    // call SSLWrite/SSLRead again make sure previous data is successfully sent
         }];
     }
-    else if (self.needRead) {
+    else {
         [_connection recv:^(int err, const void *data, size_t length) {
-            self.needRead = NO; //reset flag
-            
             if (err) {
                 NSLog(@"connection recv fail, err=%d", err);
                 callback(err);
@@ -230,10 +207,6 @@ static OSStatus _SSLWrite(SSLConnectionRef connection, const void *data, size_t 
             [self.SSLReadData appendBytes:data length:length];
             callback(0);
         }];
-    }
-    else {
-        NSAssert(false, @"we don't know we should read or write, maybe internal state is going wrong");
-        callback(-1);
     }
 }
 
@@ -262,7 +235,6 @@ static OSStatus _SSLRead(SSLConnectionRef connection, void *data, size_t *dataLe
         }
     }
     else {
-        _self.needRead = YES;
         *dataLength = 0;
         return errSSLWouldBlock;
     }
